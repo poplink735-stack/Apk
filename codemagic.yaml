@@ -10,12 +10,17 @@ workflows:
         PACKAGE_NAME: "io.codemagic.android"
       node: v16.12.0
     scripts:
+      - name: Extract Source Code Zip
+        script: |
+          echo "Extracting zip file..."
+          unzip *.zip
+          ls -la
       - name: Set up local.properties
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          cd * && echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
       - name: Build Android APK
         script: |
-          ./gradlew assembleDebug
+          cd * && chmod +x gradlew && ./gradlew assembleDebug
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - "**/build/outputs/apk/debug/*.apk"
       
