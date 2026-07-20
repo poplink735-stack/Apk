@@ -18,10 +18,17 @@ workflows:
           ls -la
       - name: Set up local.properties
         script: |
-          cd * && echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          # সব ফোল্ডারের ভেতরে local.properties ফাইল তৈরি করবে
+          find . -type d -not -path '*/.*' -exec sh -c 'echo "sdk.dir=$ANDROID_SDK_ROOT" > "{}/local.properties"' \;
       - name: Build Android APK
         script: |
-          cd * && chmod +x gradlew && ./gradlew assembleDebug
+          # সিস্টেম নিজেই খুঁজে বের করবে gradlew ফাইলটি কোন ফোল্ডারে আছে এবং সেখানে ঢুকে বিল্ড করবে
+          GRADLEW_PATH=$(find . -name "gradlew" -print -quit)
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
+          echo "Found gradlew in: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug
     artifacts:
       - "**/build/outputs/apk/debug/*.apk"
       
