@@ -10,11 +10,23 @@ workflows:
         PACKAGE_NAME: "io.codemagic.android"
       node: v16.12.0
     scripts:
-      - name: Check Zip Contents
+      - name: Extract Source Code Zip
         script: |
           echo "Extracting zip file..."
           unzip *.zip
           rm *.zip
-          echo "--- Listing all files inside the directory ---"
-          find . -maxdepth 3
-          
+          ls -la
+      - name: Set up local.properties
+        script:
+          find . -type d -not -path '*/.*' -exec sh -c 'echo "sdk.dir=$ANDROID_SDK_ROOT" > "{}/local.properties"' \;
+      - name: Build Android APK
+        script: |
+          GRADLEW_PATH=$(find . -name "gradlew" -print -quit)
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
+          echo "Found gradlew in: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug
+    artifacts:
+      - "**/build/outputs/apk/debug/*.apk"
+      
