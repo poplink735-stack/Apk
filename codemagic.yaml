@@ -14,6 +14,7 @@ workflows:
         script: |
           echo "Extracting zip file..."
           unzip *.zip
+          rm *.zip
           ls -la
       - name: Set up local.properties
         script: |
